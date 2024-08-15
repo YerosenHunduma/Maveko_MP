@@ -2,15 +2,13 @@ import { Schema, model } from 'mongoose';
 
 const categorySchema = new Schema(
     {
-        name: {
+        category: { type: String, required: true, unique: true },
+        categoryImg: {
             type: String,
-            required: true,
-            unique: true
+            default: 'https://static.scientificamerican.com/sciam/cache/file/BC2412FA-1388-43B7-877759A80E201C16_source.jpg'
         }
     },
-    {
-        timestamps: true
-    }
+    { timestamps: true }
 );
 
 export default model('Category', categorySchema);

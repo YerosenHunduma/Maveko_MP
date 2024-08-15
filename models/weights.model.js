@@ -2,7 +2,7 @@ import { Schema, model } from 'mongoose';
 
 const weightUnitSchema = new Schema(
     {
-        name: { type: String, required: true, unique: true },
+        unit: { type: String, required: true, unique: true },
         abbreviation: { type: String, required: true, unique: true }
     },
     { timestamps: true }
