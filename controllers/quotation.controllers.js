@@ -76,7 +76,6 @@ export const getQuotationById = async (req, res, next) => {
 export const sendQuoteResponse = async (req, res, next) => {
     const { data } = req.body;
     try {
-        console.log(data);
         const quote = await quotationModel.findById(data.id);
 
         if (!quote) {
@@ -94,6 +93,23 @@ export const sendQuoteResponse = async (req, res, next) => {
         await quote.save();
 
         res.status(200).json({ success: true, message: 'Quote response sent successfully' });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getMyQuote = async (req, res, next) => {
+    try {
+        const { email } = req.query;
+
+        if (!email) {
+            return next(new errorHandler('Invalid request data', 400));
+        }
+        const myQuotes = await quotationModel.find({ customer_email: email }).select('-__v');
+        if (!myQuotes) {
+            return next(new errorHandler("Couldn't find", 404));
+        }
+        res.status(200).json({ success: true, myQuotes });
     } catch (error) {
         next(error);
     }
