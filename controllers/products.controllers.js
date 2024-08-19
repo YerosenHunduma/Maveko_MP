@@ -1,4 +1,5 @@
 import productsModel from '../models/products.model.js';
+import { apiFilter } from '../utils/apiFilters.js';
 import { errorHandler } from '../utils/errorHandler.js';
 
 export const addProduct = async (req, res, next) => {
@@ -37,7 +38,8 @@ export const addProduct = async (req, res, next) => {
 
 export const getProducts = async (req, res, next) => {
     try {
-        const products = await productsModel.find({}).select('-__v');
+        const prodApiFilter = new apiFilter(productsModel, req.query).search();
+        let products = await prodApiFilter.query;
         res.status(200).json(products);
     } catch (error) {
         next(error);
