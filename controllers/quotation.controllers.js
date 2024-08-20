@@ -66,7 +66,7 @@ export const getQuotationById = async (req, res, next) => {
                 };
             })
         );
-        console.log({ ...quotation._doc, products });
+
         res.status(200).json({ success: true, quotation: { ...quotation._doc, products } });
     } catch (error) {
         next(error);
@@ -110,6 +110,31 @@ export const getMyQuote = async (req, res, next) => {
             return next(new errorHandler("Couldn't find", 404));
         }
         res.status(200).json({ success: true, myQuotes });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const qouteDetails = async (req, res, next) => {
+    const { id } = req.params;
+
+    try {
+        const quote = await quotationModel.findById(id).select('-__v');
+        if (!quote) {
+            return next(new errorHandler("Couldn't find", 404));
+        }
+
+        const products = await Promise.all(
+            quote.products.map(async (product) => {
+                const productDetails = await productsModel.findOne({ code: product.code }).select('-__v');
+                return {
+                    ...product.toObject(),
+                    productDetails
+                };
+            })
+        );
+
+        res.status(200).json({ success: true, quote: { ...quote._doc, products } });
     } catch (error) {
         next(error);
     }
