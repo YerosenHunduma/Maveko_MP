@@ -37,10 +37,19 @@ export const addProduct = async (req, res, next) => {
 };
 
 export const getProducts = async (req, res, next) => {
+    const resPerPage = 8;
+
     try {
         const prodApiFilter = new apiFilter(productsModel, req.query).search();
+
         let products = await prodApiFilter.query;
-        res.status(200).json(products);
+        const filteredProductCount = products.length;
+
+        prodApiFilter.pagination(resPerPage);
+
+        products = await prodApiFilter.query.clone();
+
+        res.status(200).json({ resPerPage, filteredProductCount, products });
     } catch (error) {
         next(error);
     }
