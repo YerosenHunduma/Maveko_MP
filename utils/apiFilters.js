@@ -15,6 +15,15 @@ export class apiFilter {
             : {};
 
         this.query = this.query.find({ ...keyword });
+
+        return this;
+    }
+
+    pagination(resPerPage) {
+        const currentPage = parseInt(this.queryStr.page) || 1;
+        const skip = (currentPage - 1) * resPerPage;
+        this.query = this.query.limit(resPerPage).skip(skip);
+
         return this;
     }
 }
