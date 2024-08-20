@@ -1,6 +1,7 @@
 import productsModel from '../models/products.model.js';
 import quotationModel from '../models/quotation.model.js';
 import { errorHandler } from '../utils/errorHandler.js';
+import { getOtpEmailTemplate } from '../utils/getOTPTemplate.js';
 import { getQuotationTemplate } from '../utils/getQuotationTemplate.js';
 import { sendMail } from '../utils/sendMaill.js';
 
@@ -20,19 +21,20 @@ export const submitQuotation = async (req, res, next) => {
         const newQuotationRequest = new quotationModel({
             customer_name: name,
             customer_email: email,
-            products: productEntries,
-            otp: Math.floor(100000 + Math.random() * 900000),
-            otp_expires_at: new Date(Date.now() + 10 * 60 * 1000)
+            products: productEntries
+            // otp: Math.floor(100000 + Math.random() * 900000),
+            // otp_expires_at: new Date(Date.now() + 10 * 60 * 1000)
         });
 
         await newQuotationRequest.save();
+        const quoteId = newQuotationRequest._id;
 
-        const followUpLink = `${process.env.CLIENT_URL}/${newQuotationRequest._id}`;
+        const followUpLink = `${process.env.CLIENT_URL}/${quoteId}`;
 
         await sendMail({
             email,
             subject: 'New Quotation',
-            message: getQuotationTemplate(name, followUpLink, newQuotationRequest.otp)
+            message: getQuotationTemplate(name, followUpLink)
         });
 
         res.status(201).json({ success: true, message: 'Quotation request created successfully', newQuotationRequest });
@@ -135,6 +137,51 @@ export const qouteDetails = async (req, res, next) => {
         );
 
         res.status(200).json({ success: true, quote: { ...quote._doc, products } });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getOTP = async (req, res, next) => {
+    const { quoteId } = req.params;
+
+    try {
+        const quote = await quotationModel.findById(quoteId);
+        if (!quote) {
+            return next(new errorHandler("Couldn't find", 404));
+        }
+        const otp = Math.floor(100000 + Math.random() * 900000);
+        quote.otp = otp;
+
+        await quote.save();
+
+        await sendMail({
+            email: quote.customer_email,
+            subject: 'Your one time password',
+            message: getOtpEmailTemplate(quote.customer_name, quote.otp)
+        });
+
+        res.status(200).json({ success: true, message: 'Your OTP has been sent successfully to your email address' });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const verifyOTP = async (req, res, next) => {
+    const { quoteId, otp } = req.body;
+
+    try {
+        const quote = await quotationModel.findById(quoteId);
+        if (!quote) {
+            return next(new errorHandler("Couldn't find", 404));
+        }
+
+        if (quote.otp !== parseInt(otp)) {
+            return next(new errorHandler('Invalid OTP', 401));
+        }
+
+        await quote.save();
+        res.status(200).json({ success: true, message: 'OTP verified successfully' });
     } catch (error) {
         next(error);
     }

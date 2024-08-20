@@ -1,4 +1,4 @@
-export const getQuotationTemplate = (username, followUpLink, otp) => `
+export const getQuotationTemplate = (username, followUpLink) => `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -68,8 +68,6 @@ export const getQuotationTemplate = (username, followUpLink, otp) => `
                                         <h2>Hi ${username},</h2>
                                         <p>Thank you for your quotation request. You can follow up on your request using the link below:</p>
                                         <p><a href="${followUpLink}" class="button">Follow Up on Your Request</a></p>
-                                        <p>Your password to access the request is: <strong>${otp}</strong></p>
-                                        <p>Please keep this password safe as it will be required to access your request.</p>
                                         <p>Best regards, <br>The Maveko Market Place Team</p>
                                     </td>
                                 </tr>
