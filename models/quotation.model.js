@@ -13,7 +13,6 @@ const quotationRequestSchema = new Schema(
         customer_email: { type: String, required: true },
         status: { type: String, enum: ['Pending', 'Cancled', 'Approved'], default: 'Pending' },
         otp: { type: Number },
-        // otp_expires_at: { type: Date, required: true },
         grandTotal: { type: Number, default: 0 }
     },
     {

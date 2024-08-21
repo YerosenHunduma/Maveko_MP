@@ -22,8 +22,6 @@ export const submitQuotation = async (req, res, next) => {
             customer_name: name,
             customer_email: email,
             products: productEntries
-            // otp: Math.floor(100000 + Math.random() * 900000),
-            // otp_expires_at: new Date(Date.now() + 10 * 60 * 1000)
         });
 
         await newQuotationRequest.save();
@@ -181,7 +179,11 @@ export const verifyOTP = async (req, res, next) => {
         }
 
         await quote.save();
-        res.status(200).json({ success: true, message: 'OTP verified successfully' });
+        const userInfo = {
+            customer_name: quote.customer_name,
+            customer_email: quote.customer_email
+        };
+        res.status(200).json({ success: true, message: 'OTP verified successfully', userInfo });
     } catch (error) {
         next(error);
     }
