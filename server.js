@@ -9,16 +9,14 @@ const PORT = process.env.PORT || 6000;
 
 const app = express();
 
-const allowedOrigins = ['http://localhost:5173'];
 // Middlewares
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
     cors({
-        origin: allowedOrigins,
-        credentials: true,
-        methods: ['GET', 'POST', 'PUT', 'DELETE']
+        origin: ['http://localhost:5173', 'https://maveko.vercel.app'],
+        credentials: true
     })
 );
 

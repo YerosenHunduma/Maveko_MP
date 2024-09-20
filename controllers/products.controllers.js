@@ -40,7 +40,7 @@ export const getProducts = async (req, res, next) => {
     const resPerPage = 8;
 
     try {
-        const prodApiFilter = new apiFilter(productsModel, req.query).search();
+        const prodApiFilter = new apiFilter(productsModel, req.query).search().populate();
 
         let products = await prodApiFilter.query;
         const filteredProductCount = products.length;
@@ -57,7 +57,13 @@ export const getProducts = async (req, res, next) => {
 
 export const getProduct = async (req, res, next) => {
     try {
-        const product = await productsModel.findById(req.params.id).select('-__v');
+        const product = await productsModel
+            .findById(req.params.id)
+            .populate({
+                path: 'source_id',
+                select: '-createdAt -updatedAt -__v'
+            })
+            .select('-__v');
         if (!product) {
             return next(new errorHandler('Product not found.', 404));
         }

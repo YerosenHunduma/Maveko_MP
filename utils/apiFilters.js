@@ -19,6 +19,14 @@ export class apiFilter {
         return this;
     }
 
+    populate() {
+        this.query = this.query.populate({
+            path: 'source_id',
+            select: '-createdAt -updatedAt -__v'
+        });
+        return this;
+    }
+
     pagination(resPerPage) {
         const currentPage = parseInt(this.queryStr.page) || 1;
         const skip = (currentPage - 1) * resPerPage;
